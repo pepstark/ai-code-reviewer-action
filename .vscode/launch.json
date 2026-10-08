@@ -1,0 +1,50 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "CLI: List Anti-Patterns (@SeshanthSathish)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/src/cli.py",
+      "args": [
+        "list",
+        "--username",
+        "SeshanthSathish"
+      ],
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "CLI: Seed Database",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/src/cli.py",
+      "args": [
+        "seed"
+      ],
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Pipeline: Run Main (Mock PR Event)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/src/main.py",
+      "env": {
+        "GITHUB_EVENT_PATH": "${workspaceFolder}/tests/mock_event.json",
+        "DB_PATH": "reviewer.db",
+        "GEMINI_API_KEY": "${env:GEMINI_API_KEY}"
+      },
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Tests: Run Pytest",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "-v",
+        "tests"
+      ],
+      "console": "integratedTerminal"
+    }
+  ]
+}
