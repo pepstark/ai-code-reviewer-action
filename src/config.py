@@ -35,7 +35,7 @@ class Config:
         _load_dotenv()
         return cls(
             github_token=os.getenv("GITHUB_TOKEN"),
-            gemini_api_key=os.getenv("GEMINI_API_KEY"),
+            gemini_api_key=os.getenv("SESH_GEMINI_BABA_KEY") or os.getenv("GEMINI_API_KEY"),
             db_path=os.getenv("DB_PATH", "reviewer.db"),
             github_event_path=os.getenv("GITHUB_EVENT_PATH"),
             gemini_model=os.getenv("GEMINI_MODEL", "gemini-1.5-flash"),
