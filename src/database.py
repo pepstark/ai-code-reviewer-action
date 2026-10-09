@@ -68,36 +68,45 @@ class DatabaseManager:
             conn.commit()
 
     def seed_default_data(self):
-        """Initializes default developer profile and anti-pattern seed inventory."""
+        """Initializes default developer profiles and anti-pattern seed inventory."""
         with self.get_connection() as conn:
             cursor = conn.cursor()
-            cursor.execute("""
-            INSERT INTO DEVELOPER (developer_id, username, email)
-            VALUES (1, 'SeshanthSathish', 'seshanth@example.com')
-            ON CONFLICT(username) DO NOTHING;
-            """)
+            # Register both SeshanthSathish and their GitHub handle pepstark
+            developers = [
+                (1, 'SeshanthSathish', 'seshanth@example.com'),
+                (2, 'pepstark', 'seshanth2007@gmail.com')
+            ]
+            for dev_id, username, email in developers:
+                cursor.execute("""
+                INSERT INTO DEVELOPER (developer_id, username, email)
+                VALUES (?, ?, ?)
+                ON CONFLICT(username) DO NOTHING;
+                """, (dev_id, username, email))
 
-            # Query developer_id for SeshanthSathish
-            cursor.execute("SELECT developer_id FROM DEVELOPER WHERE username = 'SeshanthSathish'")
-            dev = cursor.fetchone()
-            if dev:
-                dev_id = dev["developer_id"]
-                seed_mistakes = [
-                    ('SECURITY', 'Hardcoding plaintext secrets or API tokens inside source files rather than using environment variables.'),
-                    ('RESOURCE_LEAK', 'Opening file handlers or database connections without using "with" context managers or proper finally-close blocks.'),
-                    ('BOUNDARY_CHECK', 'Writing array loops using <= array.length causing out-of-bounds indexing exceptions.'),
-                    ('SQL_INJECTION', 'Constructing SQL statements using Python f-strings or direct concatenation rather than parameterized queries.')
-                ]
-                for category, description in seed_mistakes:
-                    cursor.execute("""
-                    SELECT mistake_id FROM MISTAKE_LOG
-                    WHERE developer_id = ? AND tag_category = ? AND description = ?
-                    """, (dev_id, category, description))
-                    if not cursor.fetchone():
+            seed_mistakes = [
+                ('SECURITY', 'Hardcoding plaintext secrets, passwords, or API tokens directly inside Python code instead of using environment variables (os.getenv).'),
+                ('RESOURCE_LEAK', 'Opening files using open() or database connections without using "with" context managers or proper try-finally close blocks.'),
+                ('SQL_INJECTION', 'Constructing SQL statements using Python f-strings or direct string concatenation rather than parameterized queries.'),
+                ('BOUNDARY_CHECK', 'Performing division operations without checking if the divisor is zero, causing ZeroDivisionError crashes.'),
+                ('LOGIC', 'Using bare "except:" clauses or catching generic Exception without logging, silently swallowing unexpected errors.'),
+                ('LOGIC', 'Using mutable default arguments (e.g., def func(items=[])) in Python functions causing unexpected state persistence.')
+            ]
+
+            for _, username, _ in developers:
+                cursor.execute("SELECT developer_id FROM DEVELOPER WHERE username = ?", (username,))
+                dev = cursor.fetchone()
+                if dev:
+                    d_id = dev["developer_id"]
+                    for category, description in seed_mistakes:
                         cursor.execute("""
-                        INSERT INTO MISTAKE_LOG (developer_id, tag_category, description)
-                        VALUES (?, ?, ?)
-                        """, (dev_id, category, description))
+                        SELECT mistake_id FROM MISTAKE_LOG
+                        WHERE developer_id = ? AND tag_category = ? AND description = ?
+                        """, (d_id, category, description))
+                        if not cursor.fetchone():
+                            cursor.execute("""
+                            INSERT INTO MISTAKE_LOG (developer_id, tag_category, description)
+                            VALUES (?, ?, ?)
+                            """, (d_id, category, description))
 
             conn.commit()
 

@@ -28,7 +28,7 @@ def test_tables_and_indexes_created(temp_db):
 def test_seed_default_data(temp_db):
     temp_db.seed_default_data()
     mistakes = temp_db.get_developer_mistakes("SeshanthSathish")
-    assert len(mistakes) == 4
+    assert len(mistakes) == 6
     categories = {m["tag_category"] for m in mistakes}
     assert "SECURITY" in categories
     assert "RESOURCE_LEAK" in categories

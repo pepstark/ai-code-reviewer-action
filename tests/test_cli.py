@@ -47,4 +47,4 @@ def test_cli_seed(temp_db_path):
 
     db = DatabaseManager(temp_db_path)
     mistakes = db.get_developer_mistakes("SeshanthSathish")
-    assert len(mistakes) == 4
+    assert len(mistakes) == 6
