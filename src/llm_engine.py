@@ -10,7 +10,7 @@ except ImportError:
 
 
 class LLMReviewEngine:
-    def __init__(self, api_key: Optional[str], db_manager, model_name: str = "gemini-1.5-flash"):
+    def __init__(self, api_key: Optional[str], db_manager, model_name: str = "gemini-3.8-flash"):
         self.api_key = api_key
         self.db = db_manager
         self.model_name = os.getenv("GEMINI_MODEL", model_name)

@@ -50,7 +50,7 @@ class Config:
             gemini_api_key=api_key,
             db_path=os.getenv("DB_PATH", "reviewer.db"),
             github_event_path=os.getenv("GITHUB_EVENT_PATH"),
-            gemini_model=os.getenv("GEMINI_MODEL", "gemini-1.5-flash"),
+            gemini_model=os.getenv("GEMINI_MODEL", "gemini-3.8-flash"),
         )
 
     def validate(self) -> list[str]:
