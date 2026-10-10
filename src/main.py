@@ -54,6 +54,7 @@ def main():
         sys.exit(0)
 
     # 4. Invoke LLM Review Engine
+    print(f"[INFO] Initializing LLMReviewEngine (Model: {config.gemini_model}, Key present: {bool(config.gemini_api_key)})...")
     engine = LLMReviewEngine(api_key=config.gemini_api_key, db_manager=db, model_name=config.gemini_model)
     reviews = engine.evaluate_code(parsed_diff, mistakes)
     print(f"[INFO] LLM generated {len(reviews)} review critique(s).")

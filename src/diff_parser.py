@@ -8,23 +8,30 @@ class GitDiffParser:
     @staticmethod
     def get_pr_diff(base_ref: str = "origin/main") -> str:
         """Runs local git diff command to capture changes introduced in the PR."""
-        cmd = ["git", "diff", "-U0", f"{base_ref}...HEAD"]
+        branch_name = base_ref.replace("origin/", "")
+        
+        # Ensure remote base branch is fetched in CI environments
         try:
-            result = subprocess.run(cmd, capture_output=True, text=True, check=True)
-            return result.stdout
-        except subprocess.CalledProcessError as e:
-            # Fallback attempts in case shallow fetch or alternative branch format exists
-            err_summary = e.stderr.strip().splitlines()[0] if e.stderr else str(e)
-            print(f"[WARNING] 'git diff -U0 {base_ref}...HEAD' failed: {err_summary}")
-            alt_cmd = ["git", "diff", "-U0", "HEAD~1...HEAD"]
+            subprocess.run(["git", "fetch", "origin", branch_name], capture_output=True, text=True)
+        except Exception:
+            pass
+
+        candidates = [
+            ["git", "diff", "-U0", f"origin/{branch_name}...HEAD"],
+            ["git", "diff", "-U0", f"origin/{branch_name}", "HEAD"],
+            ["git", "diff", "-U0", "HEAD^1", "HEAD^2"],
+            ["git", "diff", "-U0", "HEAD~1", "HEAD"],
+        ]
+
+        for cmd in candidates:
             try:
-                alt_result = subprocess.run(alt_cmd, capture_output=True, text=True, check=True)
-                return alt_result.stdout
+                res = subprocess.run(cmd, capture_output=True, text=True, check=True)
+                if res.stdout.strip():
+                    return res.stdout
             except Exception:
-                return ""
-        except FileNotFoundError:
-            print("[ERROR] Git executable not found in system PATH.")
-            return ""
+                continue
+
+        return ""
 
     @staticmethod
     def parse_diff(diff_text: str) -> List[Dict[str, Any]]:
