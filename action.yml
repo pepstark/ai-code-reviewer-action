@@ -8,6 +8,11 @@ inputs:
   gemini_api_key:
     description: 'Google Gemini API Key'
     required: false
+    default: ''
+  sesh_key:
+    description: 'Sesh Gemini API Key'
+    required: false
+    default: ''
   db_path:
     description: 'Relative path to localized SQLite database'
     required: false
@@ -29,7 +34,7 @@ runs:
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
         GEMINI_API_KEY: ${{ inputs.gemini_api_key }}
-        SESH_GEMINI_BABA_KEY: ${{ env.SESH_GEMINI_BABA_KEY }}
+        SESH_GEMINI_BABA_KEY: ${{ inputs.sesh_key }}
         DB_PATH: ${{ inputs.db_path }}
         GITHUB_EVENT_PATH: ${{ github.event_path }}
       run: python src/main.py
