@@ -33,9 +33,21 @@ class Config:
     @classmethod
     def from_env(cls) -> "Config":
         _load_dotenv()
+        candidate_keys = [
+            os.getenv("SESH_GEMINI_BABA_KEY"),
+            os.getenv("GEMINI_API_KEY"),
+            os.getenv("SESH_SECRET"),
+            os.getenv("GEMINI_SECRET"),
+        ]
+        api_key = None
+        for k in candidate_keys:
+            if k and k.strip().lower() not in ("true", "false", ""):
+                api_key = k.strip()
+                break
+
         return cls(
             github_token=os.getenv("GITHUB_TOKEN"),
-            gemini_api_key=os.getenv("SESH_GEMINI_BABA_KEY") or os.getenv("GEMINI_API_KEY"),
+            gemini_api_key=api_key,
             db_path=os.getenv("DB_PATH", "reviewer.db"),
             github_event_path=os.getenv("GITHUB_EVENT_PATH"),
             gemini_model=os.getenv("GEMINI_MODEL", "gemini-1.5-flash"),

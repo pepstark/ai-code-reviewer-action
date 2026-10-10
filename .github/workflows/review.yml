@@ -7,6 +7,7 @@ on:
 permissions:
   contents: read
   pull-requests: write
+  issues: write
 
 jobs:
   review:
@@ -19,7 +20,10 @@ jobs:
 
       - name: Run AI Code Reviewer Action
         uses: ./
+        env:
+          SESH_GEMINI_BABA_KEY: ${{ secrets.SESH_GEMINI_BABA_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          gemini_api_key: ${{ secrets.SESH_GEMINI_BABA_KEY || secrets.GEMINI_API_KEY }}
+          gemini_api_key: ${{ secrets.SESH_GEMINI_BABA_KEY }}
           db_path: 'reviewer.db'

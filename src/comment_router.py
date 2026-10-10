@@ -58,7 +58,25 @@ class GitHubCommentRouter:
                     )
                     successful_posts += 1
                 else:
-                    print(f"[ERROR] Failed to post comment on {file_path}:{line_number} (HTTP {response.status_code}): {response.text}")
+                    print(f"[WARNING] Inline comment failed on {file_path}:{line_number} (HTTP {response.status_code}): {response.text}")
+                    # Resilient fallback: Post as PR conversation comment so review is guaranteed visible!
+                    issue_url = f"https://api.github.com/repos/{self.repo}/issues/{self.pr_number}/comments"
+                    issue_payload = {
+                        "body": f"### ⚠️ Review for `{file_path}` (Line {line_number})\n\n{formatted_body}"
+                    }
+                    fb_res = requests.post(issue_url, json=issue_payload, headers=self.headers, timeout=15)
+                    if fb_res.status_code == 201:
+                        print(f"[SUCCESS] Fallback: Posted PR conversation comment for {file_path}:{line_number}")
+                        self.db.log_review_action(
+                            pr_number=self.pr_number,
+                            file_path=file_path,
+                            line_number=line_number,
+                            status_flag="FLAGGED",
+                            mistake_id=mistake_id
+                        )
+                        successful_posts += 1
+                    else:
+                        print(f"[ERROR] Fallback PR comment also failed (HTTP {fb_res.status_code}): {fb_res.text}")
             except Exception as e:
                 print(f"[ERROR] Network exception posting comment to {file_path}:{line_number}: {e}")
 
