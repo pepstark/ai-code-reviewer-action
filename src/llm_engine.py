@@ -50,7 +50,7 @@ Respond ONLY with a valid JSON array of objects with this schema:
     "file_path": "string",
     "line_number": integer,
     "tag_category": "string (e.g. SECURITY, RESOURCE_LEAK, BOUNDARY_CHECK, SQL_INJECTION, or GENERAL)",
-    "critique": "Actionable, constructive feedback formatted in GitHub Markdown",
+    "critique": "Actionable explanation of why this is an issue, followed by the EXACT corrected code snippet formatted in a Markdown code block so the developer can immediately replace the faulty line.",
     "mistake_id": integer or null
   }}
 ]
